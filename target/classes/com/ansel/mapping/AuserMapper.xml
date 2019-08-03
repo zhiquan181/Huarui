@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ansel.dao.IAdminDao" >
+
+	<resultMap id="BaseResultMap" type="com.ansel.bean.Auser" >
+		<result column="id" property="id" jdbcType="INTEGER" />
+	    <result column="VARCHAR" property="truename" jdbcType="VARCHAR" />
+	    <result column="password" property="password" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List" >id, account , password </sql>
+		
+	<select id="checkAuser" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from auser
+		where account = #{account, jdbcType=VARCHAR} AND password = #{password, jdbcType=VARCHAR}
+	</select>
+	
+	<select id="checkDept" resultType="com.ansel.bean.Dept" parameterType="java.lang.String">
+		select
+		department,person,account,passwd,phone,address,status
+		from Dept
+		where account = #{account, jdbcType=VARCHAR} AND passwd = #{password, jdbcType=VARCHAR}
+	</select>
+
+	<select id="displayConfig" resultType="com.ansel.bean.Config">
+		SELECT * FROM config
+	</select>
+	
+	<update id="saveInfo" parameterType="java.lang.String">
+		update config  
+		set value = case `key`
+		    when 'a_hospital_title' then #{config_title,jdbcType=VARCHAR}
+				when 'b_hospital_name' then #{config_name,jdbcType=VARCHAR}
+				when 'c_hospital_contact' then #{config_contact,jdbcType=VARCHAR}
+				when 'd_hospital_address' then #{config_address,jdbcType=VARCHAR}
+				else '无'
+		end
+	</update>
+	
+	<update id="saveAccount">
+        update auser set 
+        account=#{account,jdbcType=VARCHAR},
+        password=#{password,jdbcType=VARCHAR}
+        where id=#{id,jdbcType=INTEGER}
+    </update>
+
+
+
+
+	<insert id="insertDept" parameterType="com.ansel.bean.Dept">
+		insert into dept(department,person,account,passwd,phone,address,status)
+		values(
+		#{department,jdbcType=VARCHAR},
+		#{person,jdbcType=VARCHAR},
+		#{account,jdbcType=VARCHAR},
+		#{passwd,jdbcType=VARCHAR},
+		#{phone,jdbcType=VARCHAR},
+		#{address,jdbcType=VARCHAR},
+		#{status,jdbcType=INTEGER}
+		)
+	</insert>
+	
+	<select id="queryaccount" parameterType="java.lang.String" resultType="com.ansel.bean.Dept">
+		SELECT * FROM dept where account = #{account_str, jdbcType=VARCHAR}
+	</select>
+
+	<select id="displayDept" resultType="com.ansel.bean.Dept">
+		SELECT * FROM dept
+	</select>
+	
+	<update id="updateDept" parameterType="java.lang.String">
+        update dept set 
+        department=#{new_department},
+        person=#{person},
+        phone=#{phone},
+        address=#{address}
+        where department=#{old_department}
+    </update>
+    
+    <update id="updateStatus" parameterType="java.lang.String">
+        update dept set status=#{xstatus} where department=#{xdepart}
+    </update>
+    
+    
+    
+    
+    <select id="getTotalPatient" parameterType="string" resultType="int">
+       SELECT id FROM patient
+       <where>
+           <if test="searchPatient!=null and searchPatient!=''">
+             AND truename = #{searchPatient}
+           </if>
+       </where>
+        ORDER BY id DESC limit 1;
+    </select>
+    
+    <resultMap id="PatientResultMap" type="com.ansel.bean.Patient" >
+		<result column="id" property="id" jdbcType="INTEGER" />
+	    <result column="truename" property="truename" jdbcType="VARCHAR" />
+	    <result column="phone" property="phone" jdbcType="VARCHAR" />
+	    <result column="age" property="age" jdbcType="INTEGER" />
+	    <result column="sex" property="sex" jdbcType="VARCHAR" />
+	    <result column="identify" property="identify" jdbcType="VARCHAR" />
+	    <result column="department" property="department" jdbcType="VARCHAR" />
+	    <result column="status" property="status" jdbcType="INTEGER" />
+	    <result column="createat" property="createat"/>
+	    <result column="endtime" property="endtime"/>
+	    <result column="deviceid" property="deviceid" jdbcType="INTEGER" />
+	    <result column="deviceidcp" property="deviceidcp" jdbcType="INTEGER" />
+	</resultMap>
+	
+    <select id="getPatientPaging" resultMap="PatientResultMap">
+       SELECT id, truename , phone , age , sex ,identify , department , status , createat , endtime , deviceid , deviceidcp FROM patient
+       <where>
+           <if test="searchPatient!=null and searchPatient!=''">
+             AND truename = #{searchPatient}
+           </if>
+             AND id > #{startrow,jdbcType=INTEGER} Limit #{pagesize,jdbcType=INTEGER}
+       </where>
+    </select>
+    
+    <select id="getTotalPatientNon" parameterType="string" resultType="int">
+       select count(*) from patient where not exists (select department from dept where department = patient.department)
+    </select>
+    	
+    <select id="getPatientPagingNon" resultMap="PatientResultMap">
+       SELECT id, truename , phone , age , sex ,identify , department , status , createat , endtime , deviceid , deviceidcp FROM patient
+       where not exists (select department from dept where department = patient.department) ORDER BY id ASC Limit #{startrow,jdbcType=INTEGER} , #{pagesize,jdbcType=INTEGER}
+    </select>
+    
+    <update id="updatePatients">
+        update patient set 
+        department=#{new_department,jdbcType=VARCHAR}
+        where department=#{old_department,jdbcType=VARCHAR}
+    </update>
+
+
+
+
+	<update id="updateAuser">
+        update dept set 
+        account=#{update_account,jdbcType=VARCHAR},
+        passwd=#{update_passwd,jdbcType=VARCHAR}
+        where department=#{update_dept,jdbcType=VARCHAR}
+    </update>
+		
+    <select id="getTotalDeptAuser" parameterType="string" resultType="int">
+       SELECT count(*) FROM dept
+       <where>
+           <if test="searchAuser!=null and searchAuser!=''">
+             AND person LIKE CONCAT ('%',#{searchAuser},'%')
+           </if>
+       </where>
+        ORDER BY department DESC
+    </select>
+    
+    <select id="getDeptAuserPaging" parameterType="string" resultType="com.ansel.bean.Dept">
+       SELECT department, person , account , passwd , phone , address , status FROM dept
+       <where>
+           <if test="searchAuser!=null and searchAuser!=''">
+             AND person LIKE CONCAT ('%',#{searchAuser},'%')
+           </if>
+       </where>
+        ORDER BY department ASC Limit #{startrow,jdbcType=INTEGER} , #{pagesize,jdbcType=INTEGER}
+    </select>
+    
+    
+
+	
+</mapper>

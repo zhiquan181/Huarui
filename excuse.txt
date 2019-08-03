@@ -1,0 +1,36 @@
+--查看端口号开启情况
+netstat -ano
+netstat -n
+
+--进入C盘
+cd C:\
+
+--编译
+javac -encoding UTF-8 Client.java
+javac -encoding UTF-8 Server.java
+
+javac -encoding UTF-8 SocketServer.java
+
+--运行
+java -cp C:\apache-tomcat-8.5.34\webapps\PM2Point5\WEB-INF\classes site.assad.web.Client
+java -cp C:\apache-tomcat-8.5.34\webapps\PM2Point5\WEB-INF\classes site.assad.web.Server
+
+java -cp F:\Z_CodinG\JAVA\JavaEE_Eclipse\Huarui\src\main\java com.ansel.socket.Client
+java -cp F:\Z_CodinG\JAVA\JavaEE_Eclipse\Huarui\src\main\java com.ansel.socket.Server
+
+java -cp F:\Z_CodinG\JAVA\JavaEE_Eclipse\Huarui\src\main\java com.ansel.socket.SocketServer 
+
+java Client
+java Server
+
+telnet 192.168.1.60 8080
+
+------------------------------------------------------------------
+F:
+cd F:\Z_CodinG\JAVA\JavaEE_Eclipse\Huarui\src\main\java\com\ansel\socketshort
+javac -encoding UTF-8 Server.java
+java -cp F:\Z_CodinG\JAVA\JavaEE_Eclipse\Huarui\src\main\java com.ansel.socketshort.Server
+
+
+
+
